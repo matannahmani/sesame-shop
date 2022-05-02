@@ -1,0 +1,44 @@
+{
+  "name": "nextjs-with-typescript",
+  "version": "5.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "post-update": "echo \"codesandbox preview only, need an update\" && yarn upgrade --latest"
+  },
+  "dependencies": {
+    "@emotion/cache": "latest",
+    "@emotion/react": "latest",
+    "@emotion/server": "latest",
+    "@emotion/styled": "latest",
+    "@mui/icons-material": "latest",
+    "@mui/material": "latest",
+    "apollo-server-micro": "^3.6.7",
+    "cors": "^2.8.5",
+    "graphql-compose": "^9.0.8",
+    "graphql-compose-mongoose": "^9.7.1",
+    "graphql-request": "^4.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "micro-cors": "^0.1.1",
+    "mongoose": "^6.3.1",
+    "next": "latest",
+    "passport": "^0.5.2",
+    "passport-jwt": "^4.0.0",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-query": "^3.38.0"
+  },
+  "devDependencies": {
+    "@types/micro-cors": "^0.1.2",
+    "@types/node": "latest",
+    "@types/passport": "^1.0.7",
+    "@types/passport-jwt": "^3.0.6",
+    "@types/react": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "typescript": "latest"
+  }
+}
