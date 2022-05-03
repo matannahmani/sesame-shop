@@ -32,4 +32,18 @@ const Home: NextPage = () => {
   );
 };
 
+// get inital props
+Home.getInitialProps = async () => {
+  const homePageQuery = `query{
+    me {
+      cart {
+        productId
+      }
+      _id
+      address
+    }
+  }`;
+  return {};
+};
+
 export default Home;

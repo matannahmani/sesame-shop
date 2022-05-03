@@ -32,6 +32,7 @@
     "react-query": "^3.38.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/micro-cors": "^0.1.2",
     "@types/node": "latest",
     "@types/passport": "^1.0.7",

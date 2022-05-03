@@ -1,11 +1,24 @@
 import { ApolloServer, gql } from 'apollo-server-micro';
 import { MicroRequest } from 'apollo-server-micro/dist/types';
-import { ServerResponse } from 'http';
 import GraphQLSchema from '../../models/hyperledger/schemaBuilder';
 import dbConnect from '../../utils/dbConnect';
 import jwt from 'jsonwebtoken';
 import User from '../../models/hyperledger/users';
 import { NextApiRequest, NextApiResponse } from 'next';
+import initMiddleware from '../../utils/init-middleware';
+import Cors from 'cors';
+
+const cors = initMiddleware(
+  // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
+  Cors({
+    // Only allow requests with GET, POST and OPTIONS
+    methods: ['GET', 'POST', 'OPTIONS'],
+    // Allow requests from any domain
+    origin: '*',
+    // Allow cookies to be shared
+    credentials: true,
+  })
+);
 
 const apolloServer = new ApolloServer({
   schema: GraphQLSchema,
@@ -35,25 +48,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader(
-    'Access-Control-Allow-Origin',
-    'https://studio.apollographql.com'
-  );
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Access-Control-Allow-Credentials, Access-Control-Allow-Headers'
-  );
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'POST, GET, PUT, PATCH, DELETE, OPTIONS, HEAD'
-  );
-  if (req.method === 'OPTIONS') {
-    res.end();
-    return false;
-  }
-
+  await cors(req, res);
   await startServer;
+
   await apolloServer.createHandler({
     path: '/api/graphql',
   })(req, res);

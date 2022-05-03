@@ -41,7 +41,7 @@ schemaComposer.Query.addFields({
     if (!rp.context.user) {
       throw new Error('You are not logged in');
     }
-    const { _id } = rp.context;
+    const { _id } = rp.context.user;
     rp.beforeQuery = (query: mongoose.Query<User, unknown>) => {
       // Only allow users to see their own posts
       query.where('_id', _id);
