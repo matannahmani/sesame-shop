@@ -1,44 +1,36 @@
 import {
   ObjectTypeComposer,
+  Resolver,
   ResolverResolveParams,
   SchemaComposer,
 } from 'graphql-compose';
-import { UserTC } from './users';
-import User from './users';
+import User, { UserTC } from './users';
 import mongoose from 'mongoose';
 import { ProductTC } from './product';
 
 const schemaComposer = new SchemaComposer();
-const adminAccessOnly = (resolvers: any) => {
+
+function adminAccess(
+  resolvers: Record<string, Resolver>
+): Record<string, Resolver> {
   Object.keys(resolvers).forEach((k) => {
-    resolvers[k] = resolvers[k].wrapResolve(
-      (next: (arg0: any) => any) =>
-        async (rp: {
-          beforeRecordMutate: (doc: any, rp: any) => Promise<void>;
-        }) => {
-          // extend resolve params with hook
-          rp.beforeRecordMutate = async function (
-            doc: any,
-            rp: { context: { user: { role: string | string[] } } }
-          ) {
-            if (
-              !rp.context.user ||
-              rp.context?.user?.role.indexOf('sesame-admin') === -1
-            ) {
-              console.error("You don't have access to this resource");
-              throw new Error('You are not allowed to do this');
-            }
-          };
-          console.log('You have access to this resource');
-          return next(rp);
-        }
-    );
+    resolvers[k] = resolvers[k].wrapResolve((next) => async (rp) => {
+      if (
+        !rp.context.user ||
+        rp.context?.user?.role.indexOf('sesame-admin') === -1
+      ) {
+        console.error("You don't have access to this resource");
+        throw new Error('You are not allowed to do this');
+      }
+      return next(rp);
+    });
   });
+
   return resolvers;
-};
+}
 
 schemaComposer.Query.addFields({
-  ...adminAccessOnly({
+  ...adminAccess({
     userByIds: UserTC.mongooseResolvers.findByIds(),
     userById: UserTC.mongooseResolvers.findById(),
     userMany: UserTC.mongooseResolvers.findMany(),
@@ -62,7 +54,7 @@ schemaComposer.Query.addFields({
 });
 
 schemaComposer.Mutation.addFields({
-  ...adminAccessOnly({
+  ...adminAccess({
     userCreateOne: UserTC.mongooseResolvers.createOne(),
     userCreateMany: UserTC.mongooseResolvers.createMany(),
     userUpdateById: UserTC.mongooseResolvers.updateById(),

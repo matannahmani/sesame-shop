@@ -80,49 +80,57 @@ const UserCartTC = schemaComposer.createObjectTC(`
 `);
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
-const User = mongoose.model<User>('User', UserSchema);
-const UserTC = composeMongoose(User, customizationOptions);
-UserTC.addRelation('cart', {
-  prepareArgs: {
-    _ids: (source) => source.cart.map((item) => item.productId),
-  },
-  // type: `type UserCart { prQuantity: Float, productId: String, product: Product }`,
-  type: `[${UserCartTC.getTypeName()}]`,
-  resolve: async (source, args, context, info) => {
-    const { cart } = source;
-    const productIds = cart.map((item) => item.productId);
-    const result = await ProductTC.mongooseResolvers.findByIds().resolve({
-      source: {
-        _id: source._id,
+function createObjectTC(model: mongoose.Model<any>) {
+  let ModelTC = null;
+
+  try {
+    ModelTC = schemaComposer.getOTC(model.modelName);
+  } catch {
+    ModelTC = composeMongoose(model, customizationOptions);
+    ModelTC.addRelation('cart', {
+      prepareArgs: {
+        _ids: (source) =>
+          source.cart.map((item: { productId: any }) => item.productId),
       },
-      args: {
-        _ids: productIds,
+      // type: `type UserCart { prQuantity: Float, productId: String, product: Product }`,
+      type: `[${UserCartTC.getTypeName()}]`,
+      resolve: async (source, args, context, info) => {
+        const { cart } = source;
+        const productIds = cart.map(
+          (item: { productId: any }) => item.productId
+        );
+        const result = await ProductTC.mongooseResolvers.findByIds().resolve({
+          source: {
+            _id: source._id,
+          },
+          args: {
+            _ids: productIds,
+          },
+        });
+        const cartItems = cart.map(
+          (product: { productId: any; prQuantity: any }) => ({
+            productId: product.productId,
+            prQuantity: product.prQuantity,
+            product: result.find(
+              (item: Product) => `${item._id}` === `${product.productId}`
+            ),
+          })
+        );
+        return cartItems;
+      },
+      projection: {
+        cart: {
+          prQuantity: true,
+          productId: true,
+          product: true,
+        },
       },
     });
-    const cartItems = cart.map((product) => ({
-      productId: product.productId,
-      prQuantity: product.prQuantity,
-      product: result.find(
-        (item: Product) => `${item._id}` === `${product.productId}`
-      ),
-    }));
-    return cartItems;
-  },
-  projection: {
-    cart: {
-      prQuantity: true,
-      productId: true,
-      product: true,
-    },
-  },
-});
-// UserTC.addRelation('cart', {
-//   resolver: () => ProductTC.mongooseResolvers.findByIds(),
-//   prepareArgs: {
-//     // resolver `findByIds` has `_ids` arg, let provide value to it
-//     _ids: (source) => source.cart.map((item) => item.productId) || [],
-//   },
-//   projection: { cart: true }, // point fields in source object, which should be fetched from DB
-// });
+  }
+
+  return ModelTC;
+}
+const User = mongoose.models.User || mongoose.model<User>('User', UserSchema);
+const UserTC = createObjectTC(User);
 export { User, UserTC };
 export default User;

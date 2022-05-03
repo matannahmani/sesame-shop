@@ -1,5 +1,6 @@
 import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
+import { schemaComposer } from 'graphql-compose';
 
 interface Product extends mongoose.Document {
   productId?: string;
@@ -50,7 +51,18 @@ const ProductSchema = new mongoose.Schema<Product>(
 
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
-const Product = mongoose.model<Product>('Product', ProductSchema);
-const ProductTC = composeMongoose(Product, customizationOptions);
+const Product =
+  mongoose.models.Product || mongoose.model<Product>('Product', ProductSchema);
+function createObjectTC(model: mongoose.Model<any>) {
+  let ModelTC = null;
+
+  try {
+    ModelTC = schemaComposer.getOTC(model.modelName);
+  } catch {
+    ModelTC = composeMongoose(model, customizationOptions);
+  }
+  return ModelTC;
+}
+const ProductTC = createObjectTC(Product);
 export { Product, ProductTC };
 export default Product;
