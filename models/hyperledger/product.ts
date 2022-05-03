@@ -2,6 +2,7 @@ import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 
 interface Product extends mongoose.Document {
+  productId?: string;
   _id: mongoose.Types.ObjectId;
   name: string;
   price: number;
