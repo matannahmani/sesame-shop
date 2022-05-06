@@ -1,19 +1,82 @@
-import { createTheme } from '@mui/material/styles';
-import { red } from '@mui/material/colors';
+import { PaletteMode, ThemeOptions } from "@mui/material";
+import { orange, black, grey } from "../styles/colors";
 
-// Create a theme instance.
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#556cd6',
+const lightThemeOptions: ThemeOptions = {
+    palette: {
+        background: {
+            default: "#FFFFFF",
+            paper: "#F9F9F9",
+        },
+        text: {
+            primary: black.darkest_black,
+            secondary: grey.darkest_grey,
+            disabled: grey.middle_grey,
+        },
     },
-    secondary: {
-      main: '#19857b',
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                outlined: {
+                    borderColor: orange.keyring_orange,
+                    color: orange.keyring_orange,
+                    ":hover": {
+                        shadow: orange.keyring_orange,
+                        borderColor: orange.keyring_orange,
+                    },
+                },
+                contained: {
+                    backgroundColor: orange.keyring_orange,
+                    ":hover": {
+                        backgroundColor: orange.keyring_orange,
+                    },
+                },
+            },
+        },
     },
-    error: {
-      main: red.A400,
-    },
-  },
-});
+};
 
-export default theme;
+const darkThemeOptions: ThemeOptions = {
+    palette: {
+        background: {
+            default: "#010101",
+            paper: "#F9F9F9",
+        },
+        text: {
+            primary: "#FFFFFF",
+            secondary: grey.lightest_grey,
+            disabled: grey.middle_grey,
+        },
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                outlined: {
+                    borderColor: orange.keyring_orange,
+                    color: orange.keyring_orange,
+                    ":hover": {
+                        borderColor: orange.keyring_orange,
+                    },
+                },
+                contained: {
+                    backgroundColor: orange.keyring_orange,
+                    ":hover": {
+                        backgroundColor: orange.keyring_orange,
+                    },
+                },
+            },
+        },
+    },
+};
+
+export const getThemeOptions = (mode: PaletteMode): ThemeOptions => {
+    if (mode === "dark") return darkThemeOptions;
+    return lightThemeOptions;
+};
+
+export const getStoredTheme = (): PaletteMode | null => {
+    return localStorage.getItem("user-theme") as PaletteMode | null;
+};
+
+export const setStoredTheme = (mode: PaletteMode): void => {
+    localStorage.setItem("user-theme", mode);
+};
