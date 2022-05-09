@@ -8,6 +8,8 @@ import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { NextQueryParamProvider } from 'next-query-params';
+import { Provider } from 'jotai';
+import { SnackbarProvider } from 'notistack';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -28,9 +30,11 @@ export default function MyApp(props: MyAppProps) {
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <NextQueryParamProvider>
-            <Component {...pageProps} />
-          </NextQueryParamProvider>
+          <Provider>
+            <SnackbarProvider maxSnack={3}>
+              <Component {...pageProps} />
+            </SnackbarProvider>
+          </Provider>
         </ThemeProvider>
       </CacheProvider>
     </QueryClientProvider>

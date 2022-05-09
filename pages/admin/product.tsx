@@ -1,22 +1,32 @@
 import { Button, CircularProgress, Container, Grid } from '@mui/material';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useEffect, useState } from 'react';
 import request, { gql } from 'graphql-request';
-import { NumberParam, useQueryParam } from 'use-query-params';
-import { GridColumns, DataGrid, GridSelectionModel } from '@mui/x-data-grid';
-import NewProduct from '../../components/NewProduct';
+import {
+  BooleanParam,
+  NumberParam,
+  StringParam,
+  useQueryParam,
+  useQueryParams,
+} from 'use-query-params';
+import { GridColumns, DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import NewProduct, { ProductDrawer } from '../../components/NewProduct';
 import { Box } from '@mui/system';
 import ActionDialog from '../../components/ActionDialog';
+import Product from '../../models/hyperledger/product';
+import { Edit } from '@mui/icons-material';
+import { useAtom } from 'jotai';
+import { drawerAtom } from '../../atoms/product';
 
-const columns: GridColumns = [
-  { field: 'name', headerName: 'Name', editable: true },
-  { field: 'price', headerName: 'Price', type: 'number', editable: true },
-  { field: 'quantity', headerName: 'Quantity', editable: true },
-  { field: 'description', headerName: 'Description', editable: true },
-  { field: 'image', headerName: 'Image', editable: true },
-];
+export type ProductGraphQLQuery = {
+  productMany: Product[];
+};
 
-type ProductTableToolBar = { selection: string[]; onClick: () => void };
+type ProductTableToolBar = {
+  selection: string[];
+  onClick: () => void;
+  title: string;
+};
 
 const ProductTableToolBar = (props: ProductTableToolBar) => {
   if (props.selection.length === 0) return null;
@@ -24,32 +34,63 @@ const ProductTableToolBar = (props: ProductTableToolBar) => {
     return (
       <Box>
         <Button variant="contained" onClick={props.onClick} color="error">
-          Delete All
+          {props.title}
         </Button>
       </Box>
     );
 };
 
 const ProductPage = () => {
-  const [page, setPage] = useQueryParam('page', NumberParam);
-  const { data, isLoading } = useQuery(['products', page], async () => {
-    const data = await request(
-      'http://localhost:3000/api/graphql',
-      gql`
-        query Query {
-          productMany {
-            name
-            price
-            quantity
-            description
-            image
-            _id
+  const [drawer, setDrawer] = useAtom(drawerAtom);
+
+  const { data, isLoading, refetch } = useQuery<ProductGraphQLQuery>(
+    ['products', drawer.page],
+    async () => {
+      const data = await request(
+        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        gql`
+          query Query {
+            productMany {
+              name
+              price
+              quantity
+              description
+              image
+              _id
+            }
           }
-        }
-      `
-    );
-    return data;
-  });
+        `
+      );
+      return data;
+    }
+  );
+
+  const columns: GridColumns = [
+    { field: 'name', headerName: 'Name' },
+    { field: 'price', headerName: 'Price', type: 'number' },
+    { field: 'quantity', headerName: 'Quantity' },
+    { field: 'description', headerName: 'Description' },
+    { field: 'image', headerName: 'Image' },
+    {
+      field: '_id',
+      headerName: 'Action',
+      renderCell: (params: GridRenderCellParams<string>) => (
+        <Button
+          onClick={() => {
+            setDrawer((prev) => ({
+              ...prev,
+              isOpen: true,
+              isEditing: true,
+              _id: `${params.id}`,
+              isLoading: true,
+            }));
+          }}
+        >
+          Edit Product
+        </Button>
+      ),
+    },
+  ];
 
   const [actionDialogProps, setActionDialog] = useState({
     open: false,
@@ -58,15 +99,18 @@ const ProductPage = () => {
 
   const onClose = (success: boolean) => {
     setActionDialog({ open: false, title: '' });
+    if (success) {
+      // dialog was accepted
+      mutate(selectionModel);
+    }
   };
 
-  const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
+  const [selectionModel, setSelectionModel] = useState<string[]>([]);
 
   const { mutate, isLoading: isMutateLoading } = useMutation(
     async (ids: string[]) => {
-      console.log(ids);
       const data = await request(
-        'http://localhost:3000/api/graphql',
+        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
         gql`
           mutation ProductRemoveMany($filter: FilterRemoveManyProduct_f) {
             productRemoveMany(filter: $filter) {
@@ -78,14 +122,34 @@ const ProductPage = () => {
           filter: {
             _operators: {
               _id: {
-                in: null,
+                in: ids,
               },
             },
           },
+        },
+        {
+          Authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiX2lkIjoiNjI2ZjcxNTBkZGZlZGI3MDhmZjY5NjM4IiwiaWF0IjoxNTE2MjM5MDIyfQ.60XyJxf-8Sh6ENU68GUNQuc5fB76VPAVTAr1gzztOT4',
         }
       );
-
-      return data;
+      return {
+        deletedLength: data?.productRemoveMany?.numAffected,
+        toDelete: ids,
+      };
+    },
+    {
+      onSuccess: (mutationData) => {
+        // if (mutationData.deletedLength === mutationData.toDelete?.length) {
+        //   const newData = data?.productMany.filter(
+        //     // @ts-ignore
+        //     (p) => !mutationData.toDelete.includes(p._id)
+        //   );
+        //   queryClient.setQueryData(['products', page], newData);
+        // }
+        // queryClient.invalidateQueries(['products', page]);
+        setSelectionModel([]);
+        refetch();
+      },
     }
   );
 
@@ -103,7 +167,7 @@ const ProductPage = () => {
               columns={columns}
               checkboxSelection
               onSelectionModelChange={(newSelectionModel) => {
-                setSelectionModel(newSelectionModel);
+                setSelectionModel(newSelectionModel as string[]);
               }}
               selectionModel={selectionModel}
               getRowId={(row) => row._id}
@@ -114,9 +178,11 @@ const ProductPage = () => {
               components={{
                 Toolbar: ProductTableToolBar,
               }}
+              disableSelectionOnClick
               componentsProps={{
                 toolbar: {
                   selection: selectionModel,
+                  title: `Delete ${selectionModel.length} products`,
                   onClick: () => {
                     setActionDialog({
                       open: true,
@@ -125,7 +191,6 @@ const ProductPage = () => {
                   },
                 },
               }}
-              experimentalFeatures={{ newEditingApi: true }}
             />
           </Grid>
         </Grid>

@@ -5,7 +5,7 @@ import {
 import mongoose from 'mongoose';
 import { ObjectTypeComposer, schemaComposer } from 'graphql-compose';
 
-interface Product extends mongoose.Document {
+interface Product {
   productId?: string;
   _id: mongoose.Types.ObjectId;
   name: string;
@@ -66,8 +66,9 @@ function createObjectTC(model: mongoose.Model<any>) {
   }
   return ModelTC;
 }
+
 const ProductTC = createObjectTC(
   Product
-) as ObjectTypeComposerWithMongooseResolvers<Product>;
+) as ObjectTypeComposerWithMongooseResolvers<mongoose.Document<Product>>;
 export { Product, ProductTC };
 export default Product;
