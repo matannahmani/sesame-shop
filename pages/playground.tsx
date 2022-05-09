@@ -14,6 +14,18 @@ const marketData = [
     image: "/starbucks_americano.jpeg",
   },
   {
+    title: "스타벅스스",
+    desc: "아메리카노 Tall Size test wrap",
+    price: 50.368,
+    image: "/starbucks_americano.jpeg",
+  },
+  {
+    title: "스타벅스스스",
+    desc: "아메리카노 Tall Size test wrap",
+    price: 50.368,
+    image: "/starbucks_americano.jpeg",
+  },
+  {
     title: "꽃",
     desc: "Beautiful flower",
     price: 40.368222,

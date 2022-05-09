@@ -1,4 +1,5 @@
 import { Typography, useMediaQuery } from "@mui/material";
+import { Box } from "@mui/system";
 import { grey } from "../styles/colors";
 import ShopItem from "./ShopItem";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -24,7 +25,7 @@ const MarketGridCoin = ({ marketData }: Props) => {
   return (
     <Swiper
       slidesPerView={"auto"}
-      spaceBetween={10}
+      spaceBetween={30}
       pagination={{
         clickable: true,
       }}
@@ -35,7 +36,7 @@ const MarketGridCoin = ({ marketData }: Props) => {
         // it's simpler like this
         // P.S this component can also be splitten into two components
         // one for desktop and one for mobile (when slider is needed and when scrollbar is needed)
-        <SwiperSlide>
+        <SwiperSlide style={{ maxWidth: 360 }}>
           <ShopItem {...data} key={data.title} />
         </SwiperSlide>
       ))}
