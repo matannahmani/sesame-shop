@@ -4,20 +4,9 @@ import { IMarketGridCoin } from "./MarketGridCoin";
 import { Box } from "@mui/system";
 import Image from "next/image";
 
-type isSlide = {
-  isSlide: boolean;
-};
-
-const ShopItem = ({
-  title,
-  desc,
-  price,
-  image,
-  isSlide,
-}: IMarketGridCoin & isSlide) => (
+const ShopItem = ({ title, desc, price, image }: IMarketGridCoin) => (
   <>
     <Box
-      className={isSlide ? "keen-slider__slide" : ""}
       display="flex"
       alignItems={"center"}
       maxWidth={360}

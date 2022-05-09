@@ -23,7 +23,7 @@ interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
-  const [mode, setMode] = useState<PaletteMode>("dark"); // default is dark mode
+  const [mode, setMode] = useState<PaletteMode>("light"); // default is dark mode
 
   useEffect(() => {
     const storedTheme = getStoredTheme();
