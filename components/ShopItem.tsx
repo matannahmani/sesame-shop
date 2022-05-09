@@ -1,20 +1,20 @@
-import { Grid, Typography, Button } from "@mui/material";
-import { orange, grey } from "../styles/colors";
-import { IMarketGridCoin } from "./MarketGridCoin";
-import { Box } from "@mui/system";
-import Image from "next/image";
+import { Grid, Typography, Button } from '@mui/material';
+import { orange, grey } from '../styles/colors';
+import { Box } from '@mui/system';
+import Image from 'next/image';
+import Product from '../models/hyperledger/product';
 
-const ShopItem = ({ title, desc, price, image }: IMarketGridCoin) => (
+const ShopItem = ({ name, description, price, image, _id }: Product) => (
   <>
     <Box
       display="flex"
-      alignItems={"center"}
+      alignItems={'center'}
       maxWidth={360}
       sx={{
-        borderRadius: "15px",
-        boxShadow: "2px 2px 16px rgba(125, 98, 86, 0.1)",
-        background: "#FFFFFF",
-        fontSize: "14px",
+        borderRadius: '15px',
+        boxShadow: '2px 2px 16px rgba(125, 98, 86, 0.1)',
+        background: '#FFFFFF',
+        fontSize: '14px',
         color: grey.darkest_grey,
       }}
     >
@@ -27,19 +27,19 @@ const ShopItem = ({ title, desc, price, image }: IMarketGridCoin) => (
       </Box>
       <Box py={3} px={2}>
         <Typography variant="h5" fontWeight={700}>
-          {title}
+          {name}
         </Typography>
         <Typography
           sx={{
-            textOverflow: "ellipsis",
-            overflow: "hidden",
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
             width: 150,
-            whiteSpace: "nowrap",
+            whiteSpace: 'nowrap',
             paddingBottom: 0.6,
           }}
         >
-          {" "}
-          {desc}
+          {' '}
+          {description}
         </Typography>
         <Typography
           display="inline"
@@ -54,7 +54,7 @@ const ShopItem = ({ title, desc, price, image }: IMarketGridCoin) => (
             marginTop: 1,
             fontWeight: 700,
             borderRadius: 100,
-            width: "100%",
+            width: '100%',
           }}
         >
           교환하기

@@ -1,17 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import Head from "next/head";
-import { AppProps } from "next/app";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { CacheProvider, EmotionCache } from "@emotion/react";
-// import theme from '../src/theme';
-import createEmotionCache from "../src/createEmotionCache";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { NextQueryParamProvider } from "next-query-params";
-import { createTheme, PaletteMode } from "@mui/material";
-import ChangeTheme from "../components/ChangeTheme";
-import { getStoredTheme, getThemeOptions, setStoredTheme } from "../src/theme";
-import "../styles/styles.css";
+import Head from 'next/head';
+import { AppProps } from 'next/app';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { CacheProvider, EmotionCache } from '@emotion/react';
+import { getThemeOptions, setStoredTheme } from '../src/theme';
+import createEmotionCache from '../src/createEmotionCache';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Provider, useAtom } from 'jotai';
+import { SnackbarProvider } from 'notistack';
+import { useMemo, useEffect, useState } from 'react';
+import { createTheme, PaletteMode, responsiveFontSizes } from '@mui/material';
+import { getStoredTheme } from '../src/theme';
+import ChangeTheme from '../components/ChangeTheme';
+import { darkModeAtom } from '../components/ChangeTheme';
+import { getDesignTokens } from '../src/theme2';
+import { koKR } from '@mui/material/locale';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -23,16 +26,19 @@ interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
-  const [mode, setMode] = useState<PaletteMode>("light"); // default is dark mode
+  const [darkMode, setDarkMode] = useAtom(darkModeAtom);
+  const theme = useMemo(() => {
+    const paletteMode = darkMode ? 'dark' : 'light';
+    // @ts-ignore
+    let myTheme = createTheme({ ...getDesignTokens(paletteMode) }, koKR);
+    myTheme = responsiveFontSizes(myTheme);
+    myTheme.palette.mode = paletteMode;
+    return myTheme;
+  }, [darkMode]);
 
   useEffect(() => {
-    const storedTheme = getStoredTheme();
-
-    if (storedTheme) {
-      setMode(storedTheme);
-    }
-  }, []);
-  const theme = useMemo(() => createTheme(getThemeOptions(mode)), [mode]);
+    console.log('theme changed', theme);
+  }, [theme]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -43,17 +49,13 @@ export default function MyApp(props: MyAppProps) {
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <ChangeTheme
-            mode={mode}
-            onClick={() => {
-              const newMode: PaletteMode = mode === "dark" ? "light" : "dark";
-              setMode(newMode);
-              setStoredTheme(newMode);
-            }}
-          />
-          <NextQueryParamProvider>
-            <Component {...pageProps} />
-          </NextQueryParamProvider>
+
+          <Provider>
+            <SnackbarProvider maxSnack={3}>
+              {/* <ChangeTheme /> */}
+              <Component {...pageProps} />
+            </SnackbarProvider>
+          </Provider>
         </ThemeProvider>
       </CacheProvider>
     </QueryClientProvider>

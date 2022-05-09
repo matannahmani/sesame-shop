@@ -1,5 +1,6 @@
 /* This is a database connection function*/
 import mongoose from 'mongoose';
+mongoose.set('debug', true);
 
 const connection = {
   isConnected: false,

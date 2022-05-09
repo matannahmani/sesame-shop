@@ -38,7 +38,17 @@ schemaComposer.Query.addFields({
   }),
   productByIds: ProductTC.mongooseResolvers.findByIds(),
   productById: ProductTC.mongooseResolvers.findById(),
-  productMany: ProductTC.mongooseResolvers.findMany(),
+  productMany: ProductTC.mongooseResolvers.findMany({
+    lean: false,
+    filter: {
+      onlyIndexed: true,
+      removeFields: [],
+      requiredFields: [],
+      operators: true,
+      isRequired: false,
+      suffix: '_f',
+    },
+  }),
   productOne: ProductTC.mongooseResolvers.findOne(),
   me: UserTC.mongooseResolvers.findOne().wrapResolve((next) => (rp) => {
     if (!rp.context.user) {
@@ -70,7 +80,16 @@ schemaComposer.Mutation.addFields({
     productUpdateMany: ProductTC.mongooseResolvers.updateMany(),
     productRemoveById: ProductTC.mongooseResolvers.removeById(),
     productRemoveOne: ProductTC.mongooseResolvers.removeOne(),
-    productRemoveMany: ProductTC.mongooseResolvers.removeMany(),
+    productRemoveMany: ProductTC.mongooseResolvers.removeMany({
+      filter: {
+        onlyIndexed: true,
+        removeFields: [],
+        requiredFields: [],
+        operators: true,
+        isRequired: false,
+        suffix: '_f',
+      },
+    }),
   }),
   me: UserTC.mongooseResolvers
     .updateOne()

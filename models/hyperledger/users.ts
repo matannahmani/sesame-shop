@@ -1,5 +1,8 @@
-import { schemaComposer } from 'graphql-compose';
-import { composeMongoose } from 'graphql-compose-mongoose';
+import { schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import {
+  composeMongoose,
+  ObjectTypeComposerWithMongooseResolvers,
+} from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import Product, { ProductTC } from './product';
 
@@ -131,6 +134,8 @@ function createObjectTC(model: mongoose.Model<any>) {
   return ModelTC;
 }
 const User = mongoose.models.User || mongoose.model<User>('User', UserSchema);
-const UserTC = createObjectTC(User);
+const UserTC = createObjectTC(
+  User
+) as ObjectTypeComposerWithMongooseResolvers<User>;
 export { User, UserTC };
 export default User;

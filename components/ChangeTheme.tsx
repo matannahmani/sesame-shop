@@ -1,40 +1,27 @@
-import { Fab, PaletteMode, Switch } from "@mui/material";
-import React, { FC } from "react";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import { Fab } from '@mui/material';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai';
 
-interface Props {
-  mode: PaletteMode;
-  onClick?: () => void;
-}
-const ChangeTheme: FC<Props> = ({ mode, onClick }) => {
+export const darkModeAtom = atomWithStorage('darkMode', true);
+
+const ChangeTheme = () => {
+  const [darkMode, setDarkMode] = useAtom(darkModeAtom);
+
   return (
     <div>
-      {mode === "dark" ? (
-        <Fab
-          sx={{
-            position: "fixed",
-            bottom: (theme) => theme.spacing(2),
-            right: (theme) => theme.spacing(2),
-          }}
-          aria-label="lightMode"
-          onClick={onClick}
-        >
-          <LightModeOutlinedIcon />
-        </Fab>
-      ) : (
-        <Fab
-          sx={{
-            position: "fixed",
-            bottom: (theme) => theme.spacing(2),
-            right: (theme) => theme.spacing(2),
-          }}
-          aria-label="darkMode"
-          onClick={onClick}
-        >
-          <DarkModeOutlinedIcon />
-        </Fab>
-      )}
+      <Fab
+        sx={{
+          position: 'fixed',
+          bottom: (theme) => theme.spacing(2),
+          right: (theme) => theme.spacing(2),
+        }}
+        onClick={() => setDarkMode((prev) => !prev)}
+        aria-label={darkMode ? 'lightMode' : 'darkMode'}
+      >
+        {darkMode ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
+      </Fab>
     </div>
   );
 };
