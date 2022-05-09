@@ -1,6 +1,7 @@
-import { Button, Grid, Paper, Typography } from '@mui/material';
-import Image from 'next/image';
-import { orange } from '../styles/colors';
+import { Button, Grid, Paper, Typography } from "@mui/material";
+import { Box } from "@mui/system";
+import Image from "next/image";
+import { orange } from "../styles/colors";
 
 export interface IGridCoin {
   time: string;
@@ -10,54 +11,47 @@ export interface IGridCoin {
 
 const GridCoin = ({ time, total_coin, image }: IGridCoin) => {
   return (
-    <Grid
-      container
-      maxWidth={360}
-      p={2}
+    <Box
+      maxWidth={{ xs: 360 }}
+      display="flex"
+      alignItems={"center"}
+      justifyContent={"center"}
       sx={{
         color: orange.orange_brown,
-        background: '#F9F9F9',
-        borderRadius: '8px',
+        background: "#F9F9F9",
+        borderRadius: "8px",
       }}
     >
-      <Grid item xs={4} paddingRight={2}>
+      <Box px={2}>
         <Image src={image} alt={image} width={110} height={110} />
-      </Grid>
-      <Grid item container xs={8}>
-        <Grid item xs={12}>
-          <Typography> {time}</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography display="inline" style={{ fontSize: '12px' }}>
-            {' '}
-            Total
-          </Typography>
-          <Typography
-            display="inline"
-            style={{
-              color: orange.keyring_orange,
-              fontWeight: '700',
-            }}
-          >
-            {' '}
-            {total_coin}
-          </Typography>
-          <Typography display="inline"> SSC</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            style={{
-              fontWeight: '700',
-              borderRadius: '6px',
-              width: '100%',
-            }}
-          >
-            Start
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>
+      </Box>
+      <Box py={3} px={2}>
+        <Typography> {time}</Typography>
+        <Typography display="inline" fontSize={12}>
+          {" "}
+          Total
+        </Typography>
+        <Typography
+          display="inline"
+          sx={{ color: orange.keyring_orange, fontWeight: 700 }}
+        >
+          {" "}
+          {total_coin}
+        </Typography>
+        <Typography display="inline"> SSC</Typography>
+        <Button
+          variant="contained"
+          sx={{
+            marginTop: 1,
+            fontWeight: 700,
+            borderRadius: 1,
+            width: "100%",
+          }}
+        >
+          Start
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

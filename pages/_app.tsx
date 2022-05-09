@@ -18,52 +18,44 @@ const clientSideEmotionCache = createEmotionCache();
 const queryClient = new QueryClient();
 
 interface MyAppProps extends AppProps {
-    emotionCache?: EmotionCache;
+  emotionCache?: EmotionCache;
 }
 
 export default function MyApp(props: MyAppProps) {
-    const {
-        Component,
-        emotionCache = clientSideEmotionCache,
-        pageProps,
-    } = props;
-    const [mode, setMode] = useState<PaletteMode>("dark"); // default is dark mode
+  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+  const [mode, setMode] = useState<PaletteMode>("dark"); // default is dark mode
 
-    useEffect(() => {
-        const storedTheme = getStoredTheme();
+  useEffect(() => {
+    const storedTheme = getStoredTheme();
 
-        if (storedTheme) {
-            setMode(storedTheme);
-        }
-    }, []);
+    if (storedTheme) {
+      setMode(storedTheme);
+    }
+  }, []);
+  const theme = useMemo(() => createTheme(getThemeOptions(mode)), [mode]);
 
-    const theme = useMemo(() => createTheme(getThemeOptions(mode)), [mode]);
-    return (
-        <QueryClientProvider client={queryClient}>
-            <CacheProvider value={emotionCache}>
-                <Head>
-                    <meta
-                        name="viewport"
-                        content="initial-scale=1, width=device-width"
-                    />
-                </Head>
-                <ThemeProvider theme={theme}>
-                    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                    <CssBaseline />
-                    <ChangeTheme
-                        mode={mode}
-                        onClick={() => {
-                            const newMode: PaletteMode =
-                                mode === "dark" ? "light" : "dark";
-                            setMode(newMode);
-                            setStoredTheme(newMode);
-                        }}
-                    />
-                    <NextQueryParamProvider>
-                        <Component {...pageProps} />
-                    </NextQueryParamProvider>
-                </ThemeProvider>
-            </CacheProvider>
-        </QueryClientProvider>
-    );
+  return (
+    <QueryClientProvider client={queryClient}>
+      <CacheProvider value={emotionCache}>
+        <Head>
+          <meta name="viewport" content="initial-scale=1, width=device-width" />
+        </Head>
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <ChangeTheme
+            mode={mode}
+            onClick={() => {
+              const newMode: PaletteMode = mode === "dark" ? "light" : "dark";
+              setMode(newMode);
+              setStoredTheme(newMode);
+            }}
+          />
+          <NextQueryParamProvider>
+            <Component {...pageProps} />
+          </NextQueryParamProvider>
+        </ThemeProvider>
+      </CacheProvider>
+    </QueryClientProvider>
+  );
 }
