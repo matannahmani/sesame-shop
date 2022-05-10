@@ -57,7 +57,7 @@ const NewProduct = () => {
         0,
       ]);
       if (cachedData) {
-        const product = cachedData?.productMany.find(
+        const product = cachedData?.find(
           (product) => `${product._id}` === drawer._id
         );
         if (product) {

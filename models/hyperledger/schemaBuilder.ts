@@ -7,10 +7,12 @@ import {
 import User, { UserTC } from './users';
 import mongoose from 'mongoose';
 import { ProductTC } from './product';
+import { orderMutation, orderQuery } from './orderSchema';
+import { discountMutation, discountQuery } from './discountSchema';
 
 const schemaComposer = new SchemaComposer();
 
-function adminAccess(
+export function adminAccess(
   resolvers: Record<string, Resolver>
 ): Record<string, Resolver> {
   Object.keys(resolvers).forEach((k) => {
@@ -36,6 +38,8 @@ schemaComposer.Query.addFields({
     userMany: UserTC.mongooseResolvers.findMany(),
     userOne: UserTC.mongooseResolvers.findOne(),
   }),
+  ...orderQuery,
+  ...discountQuery,
   productByIds: ProductTC.mongooseResolvers.findByIds(),
   productById: ProductTC.mongooseResolvers.findById(),
   productMany: ProductTC.mongooseResolvers.findMany({
@@ -91,6 +95,8 @@ schemaComposer.Mutation.addFields({
       },
     }),
   }),
+  ...orderMutation,
+  ...discountMutation,
   me: UserTC.mongooseResolvers
     .updateOne()
     .wrapResolve((next) => (rp) => {

@@ -1,14 +1,7 @@
 import { Button, CircularProgress, Container, Grid } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import request, { gql } from 'graphql-request';
-import {
-  BooleanParam,
-  NumberParam,
-  StringParam,
-  useQueryParam,
-  useQueryParams,
-} from 'use-query-params';
 import { GridColumns, DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import NewProduct, { ProductDrawer } from '../../components/NewProduct';
 import { Box } from '@mui/system';
@@ -17,8 +10,12 @@ import Product from '../../models/hyperledger/product';
 import { Edit } from '@mui/icons-material';
 import { useAtom } from 'jotai';
 import { drawerAtom } from '../../atoms/product';
+import CRUDDrawer from '../../components/CRUDDrawer';
+import { globalDrawerAtom } from '../../atoms/drawer';
 
-export type ProductGraphQLQuery = Product[];
+export type ProductGraphQLQuery = {
+  productMany: Product[];
+};
 
 type ProductTableToolBar = {
   selection: string[];
@@ -38,37 +35,104 @@ const ProductTableToolBar = (props: ProductTableToolBar) => {
     );
 };
 
-const ProductPage = () => {
-  const [drawer, setDrawer] = useAtom(drawerAtom);
+const createOneDiscount = async (item: any) => {
+  const data = await request(
+    `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+
+    gql`
+      mutation DiscountCreateOne($record: CreateOneDiscountInput!) {
+        discountCreateOne(record: $record) {
+          record {
+            secret
+            validDate
+            discount
+            isPercentage
+            _id
+          }
+        }
+      }
+    `,
+    {
+      record: item,
+    },
+    {
+      Authorization:
+        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiX2lkIjoiNjI2ZjcxNTBkZGZlZGI3MDhmZjY5NjM4IiwiaWF0IjoxNTE2MjM5MDIyfQ.60XyJxf-8Sh6ENU68GUNQuc5fB76VPAVTAr1gzztOT4',
+    }
+  );
+  return data?.discountCreateOne?.record;
+};
+
+const updateOneDiscount = async (item: any) => {
+  const reqData = { ...item };
+  delete reqData._id;
+  const data = await request(
+    `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+
+    gql`
+      mutation DiscountCreateOne(
+        $record: UpdateOneDiscountInput!
+        $filter: FilterUpdateOneDiscountInput
+      ) {
+        discountUpdateOne(record: $record, filter: $filter) {
+          record {
+            secret
+            validDate
+            discount
+            isPercentage
+            _id
+          }
+        }
+      }
+    `,
+    {
+      record: reqData,
+      filter: {
+        _id: item._id,
+      },
+    },
+    {
+      Authorization:
+        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiX2lkIjoiNjI2ZjcxNTBkZGZlZGI3MDhmZjY5NjM4IiwiaWF0IjoxNTE2MjM5MDIyfQ.60XyJxf-8Sh6ENU68GUNQuc5fB76VPAVTAr1gzztOT4',
+    }
+  );
+  return data.discountUpdateOne.record;
+};
+
+const DiscountPage = () => {
+  const [drawer, setDrawer] = useAtom(globalDrawerAtom);
 
   const { data, isLoading, refetch } = useQuery<ProductGraphQLQuery>(
-    ['products', drawer.page],
+    ['discount', drawer.page],
     async () => {
       const data = await request(
         `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
         gql`
-          query Query {
-            productMany {
-              name
-              price
-              quantity
-              description
-              image
+          query DiscountMany {
+            discountMany {
+              secret
+              validDate
+              discount
+              isPercentage
               _id
             }
           }
-        `
+        `,
+        {},
+        {
+          Authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiX2lkIjoiNjI2ZjcxNTBkZGZlZGI3MDhmZjY5NjM4IiwiaWF0IjoxNTE2MjM5MDIyfQ.60XyJxf-8Sh6ENU68GUNQuc5fB76VPAVTAr1gzztOT4',
+        }
       );
-      return data;
+      return data.discountMany;
     }
   );
 
   const columns: GridColumns = [
-    { field: 'name', headerName: 'Name' },
-    { field: 'price', headerName: 'Price', type: 'number' },
-    { field: 'quantity', headerName: 'Quantity' },
-    { field: 'description', headerName: 'Description' },
-    { field: 'image', headerName: 'Image' },
+    { field: 'secret', headerName: 'Secret' },
+    { field: 'validDate', headerName: 'validDate', type: 'date' },
+    { field: 'discount', headerName: 'discount', type: 'number' },
+    { field: 'isPercentage', headerName: 'Percentage Type', type: 'boolean' },
     {
       field: '_id',
       headerName: 'Action',
@@ -78,6 +142,7 @@ const ProductPage = () => {
             setDrawer((prev) => ({
               ...prev,
               isOpen: true,
+              pageName: 'discount',
               isEditing: true,
               _id: `${params.id}`,
               isLoading: true,
@@ -138,7 +203,7 @@ const ProductPage = () => {
     {
       onSuccess: (mutationData) => {
         // if (mutationData.deletedLength === mutationData.toDelete?.length) {
-        //   const newData = data.filter(
+        //   const newData = data?.productMany.filter(
         //     // @ts-ignore
         //     (p) => !mutationData.toDelete.includes(p._id)
         //   );
@@ -161,7 +226,7 @@ const ProductPage = () => {
           <Grid item xs={12} display="flex" justifyContent="center">
             <DataGrid
               loading={isLoading}
-              rows={data || []}
+              rows={Array.isArray(data) ? data : []}
               columns={columns}
               checkboxSelection
               onSelectionModelChange={(newSelectionModel) => {
@@ -198,9 +263,31 @@ const ProductPage = () => {
         title={actionDialogProps.title}
         onClose={onClose}
       />
-      <NewProduct />
+      <CRUDDrawer
+        onCreate={createOneDiscount}
+        onUpdate={updateOneDiscount}
+        title="discount"
+        fields={[
+          {
+            name: 'secret',
+            type: 'text',
+          },
+          {
+            name: 'validDate',
+            type: 'date',
+          },
+          {
+            name: 'discount',
+            type: 'number',
+          },
+          {
+            name: 'isPercentage',
+            type: 'boolean',
+          },
+        ]}
+      />
     </>
   );
 };
 
-export default ProductPage;
+export default DiscountPage;

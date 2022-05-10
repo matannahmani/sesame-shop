@@ -11,6 +11,7 @@ interface Product {
   name: string;
   price: number;
   quantity: number;
+  enabled: boolean;
   description: string;
   image: string;
   createdAt: Date;
@@ -35,6 +36,11 @@ const ProductSchema = new mongoose.Schema<Product>(
       type: Number,
       required: true,
       min: 0,
+    },
+    enabled: {
+      type: Boolean,
+      required: true,
+      default: true,
     },
     description: {
       type: String,
