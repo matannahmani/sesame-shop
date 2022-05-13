@@ -8,9 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import Link from "next/link";
 import Product from "../models/hyperledger/product";
 import { grey, orange } from "../styles/colors";
 
+//Test data
 const cart = [
   {
     name: "스타벅스스스",
@@ -32,7 +34,14 @@ const cart = [
   },
 ];
 
-const ProductCheckout = ({ name, description, price, image, _id }: Product) => {
+const ProductCheckout = ({
+  name,
+  description,
+  price,
+  image,
+  //@ts-ignore
+  _id = "627891826859af2c3a619593",
+}: Product) => {
   return (
     <Box
       sx={{
@@ -107,7 +116,7 @@ const ProductCheckout = ({ name, description, price, image, _id }: Product) => {
           </Typography>
           <Paper variant="outlined">
             {cart.map((data) => (
-              <Box>
+              <Box key={data.name}>
                 <Box display={"flex"}>
                   <img
                     src={data.image}
@@ -143,7 +152,7 @@ const ProductCheckout = ({ name, description, price, image, _id }: Product) => {
                             fontWeight: 700,
                           }}
                         >
-                          {price}
+                          {data.price}
                         </span>{" "}
                         SSC
                       </Typography>
@@ -170,24 +179,27 @@ const ProductCheckout = ({ name, description, price, image, _id }: Product) => {
                     fontWeight: 700,
                   }}
                 >
-                  {price}
+                  {/* {price} */}
+                  40000
                 </span>{" "}
                 SSC
               </Typography>
             </Box>
-            <Button
-              variant="contained"
-              sx={{
-                marginTop: 4,
-                padding: "15px",
-                fontWeight: 700,
-                borderRadius: 2,
-                width: "100%",
-                fontSize: "16px",
-              }}
-            >
-              Complete order
-            </Button>
+            <Link href={`/order/${_id}`}>
+              <Button
+                variant="contained"
+                sx={{
+                  marginTop: 4,
+                  padding: "15px",
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  width: "100%",
+                  fontSize: "16px",
+                }}
+              >
+                Complete order
+              </Button>
+            </Link>
           </Paper>
         </Grid>
       </Grid>

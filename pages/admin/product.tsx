@@ -1,25 +1,26 @@
-import { Button, CircularProgress, Container, Grid } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useEffect, useState } from 'react';
-import request, { gql } from 'graphql-request';
+import { Button, CircularProgress, Container, Grid } from "@mui/material";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useEffect, useState } from "react";
+import request, { gql } from "graphql-request";
 import {
   BooleanParam,
   NumberParam,
   StringParam,
   useQueryParam,
   useQueryParams,
-} from 'use-query-params';
-import { GridColumns, DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
-import NewProduct, { ProductDrawer } from '../../components/NewProduct';
-import { Box } from '@mui/system';
-import ActionDialog from '../../components/ActionDialog';
-import Product from '../../models/hyperledger/product';
-import { Edit } from '@mui/icons-material';
-import { useAtom } from 'jotai';
-import { drawerAtom } from '../../atoms/product';
+} from "use-query-params";
+import { GridColumns, DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import NewProduct, { ProductDrawer } from "../../components/NewProduct";
+import { Box } from "@mui/system";
+import ActionDialog from "../../components/ActionDialog";
+import Product from "../../models/hyperledger/product";
+import { Edit } from "@mui/icons-material";
+import { useAtom } from "jotai";
+import { drawerAtom } from "../../atoms/product";
 
 export type ProductGraphQLQuery = {
   productMany: Product[];
+  productById: Product;
 };
 
 type ProductTableToolBar = {
@@ -44,7 +45,7 @@ const ProductPage = () => {
   const [drawer, setDrawer] = useAtom(drawerAtom);
 
   const { data, isLoading, refetch } = useQuery<ProductGraphQLQuery>(
-    ['products', drawer.page],
+    ["products", drawer.page],
     async () => {
       const data = await request(
         `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
@@ -66,14 +67,14 @@ const ProductPage = () => {
   );
 
   const columns: GridColumns = [
-    { field: 'name', headerName: 'Name' },
-    { field: 'price', headerName: 'Price', type: 'number' },
-    { field: 'quantity', headerName: 'Quantity' },
-    { field: 'description', headerName: 'Description' },
-    { field: 'image', headerName: 'Image' },
+    { field: "name", headerName: "Name" },
+    { field: "price", headerName: "Price", type: "number" },
+    { field: "quantity", headerName: "Quantity" },
+    { field: "description", headerName: "Description" },
+    { field: "image", headerName: "Image" },
     {
-      field: '_id',
-      headerName: 'Action',
+      field: "_id",
+      headerName: "Action",
       renderCell: (params: GridRenderCellParams<string>) => (
         <Button
           onClick={() => {
@@ -94,11 +95,11 @@ const ProductPage = () => {
 
   const [actionDialogProps, setActionDialog] = useState({
     open: false,
-    title: '',
+    title: "",
   });
 
   const onClose = (success: boolean) => {
-    setActionDialog({ open: false, title: '' });
+    setActionDialog({ open: false, title: "" });
     if (success) {
       // dialog was accepted
       mutate(selectionModel);
@@ -129,7 +130,7 @@ const ProductPage = () => {
         },
         {
           Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiX2lkIjoiNjI2ZjcxNTBkZGZlZGI3MDhmZjY5NjM4IiwiaWF0IjoxNTE2MjM5MDIyfQ.60XyJxf-8Sh6ENU68GUNQuc5fB76VPAVTAr1gzztOT4',
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiX2lkIjoiNjI2ZjcxNTBkZGZlZGI3MDhmZjY5NjM4IiwiaWF0IjoxNTE2MjM5MDIyfQ.60XyJxf-8Sh6ENU68GUNQuc5fB76VPAVTAr1gzztOT4",
         }
       );
       return {
@@ -172,7 +173,7 @@ const ProductPage = () => {
               selectionModel={selectionModel}
               getRowId={(row) => row._id}
               sx={{
-                minHeight: '540px',
+                minHeight: "540px",
                 maxWidth: 640,
               }}
               components={{
