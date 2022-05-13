@@ -1,26 +1,28 @@
-import { Container, Typography } from "@mui/material";
-import { dehydrate, QueryClient, useQuery } from "react-query";
-import { GetStaticPaths, GetStaticProps } from "next";
-import ProductItem from "../../components/ProductItem";
-import request, { gql } from "graphql-request";
-import { ProductGraphQLQuery } from "../admin/product";
-import { useRouter } from "next/router";
+import { Container, Typography } from '@mui/material';
+import { dehydrate, QueryClient, useQuery } from 'react-query';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import ProductItem from '../../components/ProductItem';
+import request, { gql } from 'graphql-request';
+import { ProductGraphQLQuery } from '../admin/product';
+import { useRouter } from 'next/router';
 
 const ProductDetailsPage = () => {
   const router = useRouter();
   const productId =
-    typeof router.query?._id === "string" ? router.query._id : "";
+    typeof router.query?._id === 'string' ? router.query._id : '';
 
   const { data, isLoading, isError, error } = useQuery<ProductGraphQLQuery>(
-    ["product/id", `${productId}`],
+    ['product/id', `${productId}`],
     () => getProductById(productId)
   );
 
   if (isLoading) return <Typography>Loading...</Typography>;
 
+  //Good way ?
+  if (data?.productById === undefined) return router.replace('/404');
+
   return (
     <Container>
-      {/* @ts-ignore */}
       <ProductItem {...data?.productById} />
     </Container>
   );
@@ -36,7 +38,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   console.log(mappedIds);
   return {
     paths: mappedIds,
-    fallback: "blocking",
+    fallback: 'blocking',
   };
 };
 
@@ -48,7 +50,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
   const params = ctx.params as ProductPageParams;
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(["product/id", `${params._id}`], () =>
+  await queryClient.prefetchQuery(['product/id', `${params._id}`], () =>
     getProductById(`${params._id}`)
   );
 

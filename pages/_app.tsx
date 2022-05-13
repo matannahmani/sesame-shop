@@ -36,9 +36,9 @@ export default function MyApp(props: MyAppProps) {
     return myTheme;
   }, [darkMode]);
 
-  useEffect(() => {
-    console.log('theme changed', theme);
-  }, [theme]);
+  // useEffect(() => {
+  //   console.log('theme changed', theme);
+  // }, [theme]);
 
   return (
     <QueryClientProvider client={queryClient}>
