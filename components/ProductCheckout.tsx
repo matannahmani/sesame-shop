@@ -6,31 +6,32 @@ import {
   Paper,
   TextField,
   Typography,
-} from "@mui/material";
-import { Box } from "@mui/system";
-import Link from "next/link";
-import Product from "../models/hyperledger/product";
-import { grey, orange } from "../styles/colors";
+} from '@mui/material';
+import { Box } from '@mui/system';
+import Link from 'next/link';
+import Product from '../models/hyperledger/product';
+import { grey, orange } from '../styles/colors';
+import { Types } from 'mongoose';
 
 //Test data
 const cart = [
   {
-    name: "스타벅스스스",
-    desc: "아메리카노 Tall Size test wrap",
+    name: '스타벅스스스',
+    desc: '아메리카노 Tall Size test wrap',
     price: 50.368,
-    image: "/starbucks_americano.jpeg",
+    image: '/starbucks_americano.jpeg',
   },
   {
-    name: "꽃",
-    desc: "Beautiful flower",
+    name: '꽃',
+    desc: 'Beautiful flower',
     price: 40.368222,
-    image: "/꽃.jpeg",
+    image: '/꽃.jpeg',
   },
   {
-    name: "꽃꽃",
-    desc: "Beautiful flower",
+    name: '꽃꽃',
+    desc: 'Beautiful flower',
     price: 40.368222,
-    image: "/꽃.jpeg",
+    image: '/꽃.jpeg',
   },
 ];
 
@@ -39,16 +40,15 @@ const ProductCheckout = ({
   description,
   price,
   image,
-  //@ts-ignore
-  _id = "627891826859af2c3a619593",
-}: Product) => {
+  _id = new Types.ObjectId('627891826859af2c3a619593'),
+}: Partial<Product>) => {
   return (
     <Box
       sx={{
         margin: 4,
-        paddingTop: "64px",
-        paddingBottom: "64px",
-        maxWidth: "1236px",
+        paddingTop: '64px',
+        paddingBottom: '64px',
+        maxWidth: '1236px',
       }}
     >
       <Grid container spacing={4}>
@@ -117,23 +117,23 @@ const ProductCheckout = ({
           <Paper variant="outlined">
             {cart.map((data) => (
               <Box key={data.name}>
-                <Box display={"flex"}>
+                <Box display={'flex'}>
                   <img
                     src={data.image}
                     alt={data.image}
-                    width={"100%"}
-                    height={"100%"}
+                    width={'100%'}
+                    height={'100%'}
                     style={{
-                      borderRadius: "8px",
-                      maxWidth: "120px",
-                      marginRight: "16px",
+                      borderRadius: '8px',
+                      maxWidth: '120px',
+                      marginRight: '16px',
                     }}
                   />
 
                   <Box
-                    display={"flex"}
-                    justifyContent={"space-between"}
-                    alignItems={"flex-start"}
+                    display={'flex'}
+                    justifyContent={'space-between'}
+                    alignItems={'flex-start'}
                     flexDirection="column"
                   >
                     <Box>
@@ -147,41 +147,41 @@ const ProductCheckout = ({
                       >
                         <span
                           style={{
-                            fontSize: "1rem",
+                            fontSize: '1rem',
                             color: orange.keyring_orange,
                             fontWeight: 700,
                           }}
                         >
                           {data.price}
-                        </span>{" "}
+                        </span>{' '}
                         SSC
                       </Typography>
                     </Box>
                   </Box>
                 </Box>
                 <Divider
-                  sx={{ borderColor: "rgba(255, 255, 255, 0.45)" }}
-                  style={{ margin: "24px 0px 24px 0px" }}
+                  sx={{ borderColor: 'rgba(255, 255, 255, 0.45)' }}
+                  style={{ margin: '24px 0px 24px 0px' }}
                 />
               </Box>
             ))}
             <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
+              display={'flex'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
             >
               <Typography>Order Total</Typography>
               <Typography display="inline" sx={{ color: grey.lightest_grey }}>
                 <span
                   style={{
-                    fontSize: "1.4rem",
+                    fontSize: '1.4rem',
                     color: orange.keyring_orange,
                     fontWeight: 700,
                   }}
                 >
                   {/* {price} */}
                   40000
-                </span>{" "}
+                </span>{' '}
                 SSC
               </Typography>
             </Box>
@@ -190,11 +190,11 @@ const ProductCheckout = ({
                 variant="contained"
                 sx={{
                   marginTop: 4,
-                  padding: "15px",
+                  padding: '15px',
                   fontWeight: 700,
                   borderRadius: 2,
-                  width: "100%",
-                  fontSize: "16px",
+                  width: '100%',
+                  fontSize: '16px',
                 }}
               >
                 Complete order
