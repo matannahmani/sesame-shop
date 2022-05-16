@@ -122,12 +122,15 @@ function createObjectTC(model: mongoose.Model<any>) {
         return cartItems;
       },
       projection: {
-        cart: {
-          prQuantity: true,
-          productId: true,
-          product: true,
-        },
+        cart: 1,
       },
+      // projection: {
+      //   cart: {
+      //     prQuantity: true,
+      //     productId: false,
+      //     product: true,
+      //   },
+      // },
     });
   }
 
