@@ -1,31 +1,34 @@
-import { Button, Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import OrderPendingSkeleton from '../../components/OrderPendingSkeleton';
-// import OrderPending from "../../components/OrderPending";
-import { lazy, Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { useQueryErrorResetBoundary } from 'react-query';
+import OrderPending from '../../components/OrderPending';
+import { useQuery } from 'react-query';
+import { useRouter } from 'next/router';
+import { getProductById } from '../product/[_id]';
+import { ProductGraphQLQuery } from '../admin/product';
 
-const OrderPending = lazy(() => import('../../components/OrderPending'));
+const Order = () => {
+  const router = useRouter();
+  const productId =
+    typeof router.query?._id === 'string' ? router.query._id : '';
 
-const Order: React.FC = () => {
-  const { reset } = useQueryErrorResetBoundary();
-  console.log(reset);
+  //TODO : Change fetch function to get cart products
+  const { data, isLoading, isError } = useQuery<ProductGraphQLQuery>(
+    ['order/id', `${productId}`],
+    () => getProductById(productId)
+  );
+
+  if (isError) {
+    router.replace('/404');
+  }
 
   return (
-    <Container>
-      <ErrorBoundary
-        onReset={() => console.log('test')}
-        FallbackComponent={({ resetErrorBoundary }) => (
-          <div>
-            There was an error!
-            <Button onClick={() => resetErrorBoundary()}>Try again</Button>
-          </div>
-        )}
-      >
-        <Suspense fallback={<OrderPendingSkeleton />}>
-          <OrderPending />
-        </Suspense>
-      </ErrorBoundary>
+    <Container maxWidth="xl">
+      {isLoading ? (
+        <OrderPendingSkeleton />
+      ) : (
+        // ts-ignore
+        <OrderPending {...data?.productById} />
+      )}
     </Container>
   );
 };

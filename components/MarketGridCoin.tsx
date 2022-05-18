@@ -11,8 +11,7 @@ import request from 'graphql-request';
 import { gql } from 'apollo-server-micro';
 
 const MarketGridCoin = () => {
-  // const isSlide = useMediaQuery("(max-width:600px)");
-  const { data, isLoading, refetch } = useQuery<ProductGraphQLQuery>(
+  const { data, isLoading } = useQuery<ProductGraphQLQuery>(
     'products/market',
     async () => {
       const data = await request(
@@ -51,9 +50,6 @@ const MarketGridCoin = () => {
           </SwiperSlide>
         ))}
       {data?.productMany.map((data) => (
-        // it's simpler like this
-        // P.S this component can also be splitten into two components
-        // one for desktop and one for mobile (when slider is needed and when scrollbar is needed)
         <SwiperSlide key={`${data._id}`} style={{ maxWidth: 360 }}>
           <ShopItem {...data} />
         </SwiperSlide>

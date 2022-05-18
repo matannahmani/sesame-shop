@@ -1,53 +1,15 @@
-import Container from '@mui/material/Container';
-
 import { Button, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { orange } from '../styles/colors';
+
 import GridCoin from '../components/GridCoin';
 import MarketGridCoin from '../components/MarketGridCoin';
-import { useQuery } from 'react-query';
-import { ProductGraphQLQuery } from './admin/product';
-
-// const marketData = [
-//   {
-//     title: "스타벅스",
-//     desc: "아메리카노 Tall Size test wrap",
-//     price: 50.368,
-//     image: "/starbucks_americano.jpeg",
-//   },
-//   {
-//     title: "스타벅스스",
-//     desc: "아메리카노 Tall Size test wrap",
-//     price: 50.368,
-//     image: "/starbucks_americano.jpeg",
-//   },
-//   {
-//     title: "스타벅스스스",
-//     desc: "아메리카노 Tall Size test wrap",
-//     price: 50.368,
-//     image: "/starbucks_americano.jpeg",
-//   },
-//   {
-//     title: "꽃",
-//     desc: "Beautiful flower",
-//     price: 40.368222,
-//     image: "/꽃.jpeg",
-//   },
-//   {
-//     title: "꽃꽃",
-//     desc: "Beautiful flower",
-//     price: 40.368222,
-//     image: "/꽃.jpeg",
-//   },
-//   {
-//     title: "꽃꽃꽃",
-//     desc: "Beautiful flower",
-//     price: 40.368222,
-//     image: "/꽃.jpeg",
-//   },
-// ];
+import { useQueryClient } from 'react-query';
+import { orange } from '../styles/colors';
 
 const Home = () => {
+  const queryClient = useQueryClient();
+  queryClient.setQueryData('user/id', '626f7150ddfedb708ff69638');
+
   return (
     <Grid container spacing={3} padding={5} paddingX={4}>
       <Grid item xs={8}>

@@ -1,6 +1,5 @@
 import {
   Button,
-  Divider,
   FormControl,
   Grid,
   Paper,
@@ -9,39 +8,41 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/system';
 import Link from 'next/link';
-import Product from '../models/hyperledger/product';
 import { grey, orange } from '../styles/colors';
-import { Types } from 'mongoose';
+import OrderSummary from './OrderSummary';
+import request, { gql } from 'graphql-request';
+import { useQuery } from 'react-query';
+import { ProductGraphQLQuery } from '../pages/admin/product';
 
-//Test data
-const cart = [
-  {
-    name: '스타벅스스스',
-    desc: '아메리카노 Tall Size test wrap',
-    price: 50.368,
-    image: '/starbucks_americano.jpeg',
-  },
-  {
-    name: '꽃',
-    desc: 'Beautiful flower',
-    price: 40.368222,
-    image: '/꽃.jpeg',
-  },
-  {
-    name: '꽃꽃',
-    desc: 'Beautiful flower',
-    price: 40.368222,
-    image: '/꽃.jpeg',
-  },
-];
+const ProductCheckout = () => {
+  // TODO : change query to cart get data
 
-const ProductCheckout = ({
-  name,
-  description,
-  price,
-  image,
-  _id = new Types.ObjectId('627891826859af2c3a619593'),
-}: Partial<Product>) => {
+  const { data, isLoading } = useQuery<ProductGraphQLQuery>(
+    'cart/products',
+    async () => {
+      const data = await request(
+        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        gql`
+          query Query {
+            productMany {
+              name
+              price
+              quantity
+              description
+              image
+              _id
+            }
+          }
+        `
+      );
+      return data;
+    }
+  );
+
+  const total = data?.productMany.reduce((sum, current) => {
+    return sum + current.price;
+  }, 0);
+
   return (
     <Box
       sx={{
@@ -115,63 +116,19 @@ const ProductCheckout = ({
             Order summary
           </Typography>
           <Paper variant="outlined">
-            {cart.map((data) => (
-              <Box key={data.name}>
-                <Box display={'flex'}>
-                  <img
-                    src={data.image}
-                    alt={data.image}
-                    width={'100%'}
-                    height={'100%'}
-                    style={{
-                      borderRadius: '8px',
-                      maxWidth: '120px',
-                      marginRight: '16px',
-                    }}
-                  />
-
-                  <Box
-                    display={'flex'}
-                    justifyContent={'space-between'}
-                    alignItems={'flex-start'}
-                    flexDirection="column"
-                  >
-                    <Box>
-                      <Typography variant="subtitle1">{data.name}</Typography>
-                    </Box>
-                    <Box>
-                      <Typography
-                        sx={{
-                          color: grey.lightest_grey,
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: '1rem',
-                            color: orange.keyring_orange,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {data.price}
-                        </span>{' '}
-                        SSC
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-                <Divider
-                  sx={{ borderColor: 'rgba(255, 255, 255, 0.45)' }}
-                  style={{ margin: '24px 0px 24px 0px' }}
-                />
-              </Box>
+            {data?.productMany.map((data, index) => (
+              <OrderSummary key={index} {...data} />
             ))}
             <Box
               display={'flex'}
               justifyContent={'space-between'}
               alignItems={'center'}
             >
-              <Typography>Order Total</Typography>
-              <Typography display="inline" sx={{ color: grey.lightest_grey }}>
+              <Typography sx={{ px: '10px' }}>Order Total</Typography>
+              <Typography
+                display="inline"
+                sx={{ color: grey.lightest_grey, px: '10px' }}
+              >
                 <span
                   style={{
                     fontSize: '1.4rem',
@@ -179,13 +136,13 @@ const ProductCheckout = ({
                     fontWeight: 700,
                   }}
                 >
-                  {/* {price} */}
-                  40000
+                  {total}
                 </span>{' '}
                 SSC
               </Typography>
             </Box>
-            <Link href={`/order/${_id}`}>
+            {/* TODO : CHANGE ORDER ID */}
+            <Link href={`/order/${'627891826859af2c3a619593'}`}>
               <Button
                 variant="contained"
                 sx={{

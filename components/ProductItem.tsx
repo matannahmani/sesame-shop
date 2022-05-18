@@ -1,40 +1,49 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
-import Link from "next/link";
-import Product from "../models/hyperledger/product";
-import { grey, orange } from "../styles/colors";
+import { Box, Button, Grid, Skeleton, Typography } from '@mui/material';
+import Image from 'next/image';
+import Link from 'next/link';
+import Product from '../models/hyperledger/product';
+import { grey, orange } from '../styles/colors';
 
-const ProductItem = ({ name, description, price, image, _id }: Product) => {
+const ProductItem = ({ name, description, price, image }: Product) => {
   return (
     <Box
       sx={{
         margin: 4,
-        paddingTop: "64px",
-        paddingBottom: "64px",
-        maxWidth: "1236px",
+        paddingTop: '64px',
+        paddingBottom: '64px',
+        maxWidth: '1236px',
       }}
     >
       <Grid container spacing={6}>
         <Grid item xs={12} md={6} lg={7}>
           <Box
             sx={{
-              display: "flex",
-              height: "100%",
+              position: 'relative',
+              display: 'flex',
+              height: { xs: '200px', md: '100%' },
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <img
-              src={image}
-              alt={image}
-              width={"100%"}
-              height={"100%"}
-              style={{ borderRadius: "8px", objectFit: "cover" }}
-            />
+            {image ? (
+              <Image
+                src={image}
+                alt={image}
+                priority
+                layout="fill"
+                objectFit="contain"
+              />
+            ) : (
+              <Skeleton variant="rectangular" width={320} height={300} />
+            )}
           </Box>
         </Grid>
         <Grid item xs={12} md={6} lg={5}>
           <Box
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
+            display={'flex'}
+            justifyContent={'space-between'}
+            alignItems={'center'}
           >
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
               {name}
@@ -42,13 +51,13 @@ const ProductItem = ({ name, description, price, image, _id }: Product) => {
             <Typography sx={{ color: grey.lightest_grey }}>
               <span
                 style={{
-                  fontSize: "2rem",
+                  fontSize: '2rem',
                   color: orange.keyring_orange,
                   fontWeight: 700,
                 }}
               >
                 {price}
-              </span>{" "}
+              </span>{' '}
               SSC
             </Typography>
           </Box>
@@ -62,11 +71,11 @@ const ProductItem = ({ name, description, price, image, _id }: Product) => {
               sx={{
                 marginTop: 4,
                 // margin: "16px 0px 0px 16px",
-                padding: "15px",
+                padding: '15px',
                 fontWeight: 700,
                 borderRadius: 2,
-                width: "100%",
-                fontSize: "16px",
+                width: '100%',
+                fontSize: '16px',
               }}
             >
               BUY
@@ -77,11 +86,11 @@ const ProductItem = ({ name, description, price, image, _id }: Product) => {
             sx={{
               marginTop: 4,
               // margin: "16px 0px 0px 16px",
-              padding: "15px",
+              padding: '15px',
               fontWeight: 700,
               borderRadius: 2,
-              width: "100%",
-              fontSize: "16px",
+              width: '100%',
+              fontSize: '16px',
             }}
           >
             Add to Cart

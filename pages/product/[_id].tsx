@@ -1,5 +1,5 @@
 import { Container, Typography } from '@mui/material';
-import { dehydrate, QueryClient, useQuery } from 'react-query';
+import { dehydrate, QueryClient, useQuery, useQueryClient } from 'react-query';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import ProductItem from '../../components/ProductItem';
 import request, { gql } from 'graphql-request';
@@ -16,13 +16,12 @@ const ProductDetailsPage = () => {
     () => getProductById(productId)
   );
 
-  if (isLoading) return <Typography>Loading...</Typography>;
-
-  //Good way ?
-  if (data?.productById === undefined) return router.replace('/404');
+  // const queryClient = useQueryClient();
+  // console.log(queryClient.getQueryData('user/id'));
 
   return (
-    <Container>
+    <Container maxWidth="xl">
+      {/* ts-ignore */}
       <ProductItem {...data?.productById} />
     </Container>
   );
@@ -80,7 +79,7 @@ const getProductIds = async () => {
   return data.productMany as productIds;
 };
 
-const getProductById = async (id: string) => {
+export const getProductById = async (id: string) => {
   const data = await request(
     `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
     gql`
@@ -99,6 +98,9 @@ const getProductById = async (id: string) => {
       id: id,
     }
   );
+  if (data?.productById === null) {
+    throw new Error('Product not found');
+  }
   return data;
 };
 

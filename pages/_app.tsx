@@ -15,7 +15,8 @@ import ChangeTheme from '../components/ChangeTheme';
 import { darkModeAtom } from '../components/ChangeTheme';
 import { getDesignTokens } from '../src/theme2';
 import { koKR } from '@mui/material/locale';
-
+import { ReactQueryDevtools } from 'react-query/devtools';
+import PrevPageIcon from '../components/PrevPageIcon';
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 const queryClient = new QueryClient();
@@ -53,11 +54,13 @@ export default function MyApp(props: MyAppProps) {
           <Provider>
             <SnackbarProvider maxSnack={3}>
               {/* <ChangeTheme /> */}
+              <PrevPageIcon />
               <Component {...pageProps} />
             </SnackbarProvider>
           </Provider>
         </ThemeProvider>
       </CacheProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
