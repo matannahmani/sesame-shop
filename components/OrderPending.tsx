@@ -7,7 +7,12 @@ import Product from '../models/hyperledger/product';
 import { ProductGraphQLQuery } from '../pages/admin/product';
 import OrderSummary from './OrderSummary';
 
-const OrderPending = ({ name, description, price, image }: Product) => {
+const OrderPending = ({
+  name,
+  description,
+  price,
+  image,
+}: Partial<Product>) => {
   // const router = useRouter();
   // const productId =
   //   typeof router.query?._id === 'string' ? router.query._id : '';
@@ -36,7 +41,7 @@ const OrderPending = ({ name, description, price, image }: Product) => {
           }
         `
       );
-      return data;
+      return data.productMany;
     }
   );
 
@@ -50,7 +55,7 @@ const OrderPending = ({ name, description, price, image }: Product) => {
       }}
     >
       <Stack spacing={2} alignItems={'center'}>
-        {data?.productMany.map((data, index) => (
+        {data?.map((data, index) => (
           <OrderSummary key={index} {...data} />
         ))}
         <Typography variant="h6" marginRight={'10px'}>

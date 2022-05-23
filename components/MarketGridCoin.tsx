@@ -29,7 +29,7 @@ const MarketGridCoin = () => {
           }
         `
       );
-      return data;
+      return data.productMany;
     }
   );
 
@@ -49,7 +49,7 @@ const MarketGridCoin = () => {
             <Skeleton variant="rectangular" width={320} height={200} />
           </SwiperSlide>
         ))}
-      {data?.productMany.map((data) => (
+      {data?.map((data) => (
         <SwiperSlide key={`${data._id}`} style={{ maxWidth: 360 }}>
           <ShopItem {...data} />
         </SwiperSlide>

@@ -21,8 +21,8 @@ const ProductDetailsPage = () => {
 
   return (
     <Container maxWidth="xl">
-      {/* ts-ignore */}
-      <ProductItem {...data?.productById} />
+      {/* @ts-ignore */}
+      <ProductItem {...data} />
     </Container>
   );
 };
@@ -101,7 +101,7 @@ export const getProductById = async (id: string) => {
   if (data?.productById === null) {
     throw new Error('Product not found');
   }
-  return data;
+  return data.productById;
 };
 
 export default ProductDetailsPage;

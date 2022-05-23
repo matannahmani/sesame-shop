@@ -13,6 +13,7 @@ import OrderSummary from './OrderSummary';
 import request, { gql } from 'graphql-request';
 import { useQuery } from 'react-query';
 import { ProductGraphQLQuery } from '../pages/admin/product';
+import Product from '../models/hyperledger/product';
 
 const ProductCheckout = () => {
   // TODO : change query to cart get data
@@ -35,11 +36,11 @@ const ProductCheckout = () => {
           }
         `
       );
-      return data;
+      return data.productMany;
     }
   );
 
-  const total = data?.productMany.reduce((sum, current) => {
+  const total = data?.reduce((sum: number, current: Product) => {
     return sum + current.price;
   }, 0);
 
@@ -116,7 +117,7 @@ const ProductCheckout = () => {
             Order summary
           </Typography>
           <Paper variant="outlined">
-            {data?.productMany.map((data, index) => (
+            {data?.map((data, index) => (
               <OrderSummary key={index} {...data} />
             ))}
             <Box

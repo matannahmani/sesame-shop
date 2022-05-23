@@ -201,7 +201,7 @@ const NewProduct = () => {
           }
           queryClient.invalidateQueries('products');
         },
-        onError: (error) => {
+        onError: (error: any) => {
           enqueueSnackbar(`Error: ${error?.message}`, {
             variant: 'error',
           });

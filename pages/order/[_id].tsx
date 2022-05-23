@@ -26,8 +26,8 @@ const Order = () => {
       {isLoading ? (
         <OrderPendingSkeleton />
       ) : (
-        // ts-ignore
-        <OrderPending {...data?.productById} />
+        // @ts-ignore
+        <OrderPending {...data} />
       )}
     </Container>
   );
