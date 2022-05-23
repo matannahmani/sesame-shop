@@ -17,6 +17,9 @@ import { getDesignTokens } from '../src/theme2';
 import { koKR } from '@mui/material/locale';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import PrevPageIcon from '../components/PrevPageIcon';
+import { Web3ReactProvider } from '@web3-react/core';
+import { hooks as metaMaskHooks, metaMask } from '../connectors/metaMask';
+
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 const queryClient = new QueryClient();
@@ -47,18 +50,20 @@ export default function MyApp(props: MyAppProps) {
         <Head>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
-        <ThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
+        <Web3ReactProvider connectors={[[metaMask, metaMaskHooks]]}>
+          <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
 
-          <Provider>
-            <SnackbarProvider maxSnack={3}>
-              {/* <ChangeTheme /> */}
-              <PrevPageIcon />
-              <Component {...pageProps} />
-            </SnackbarProvider>
-          </Provider>
-        </ThemeProvider>
+            <Provider>
+              <SnackbarProvider maxSnack={3}>
+                {/* <ChangeTheme /> */}
+                <PrevPageIcon />
+                <Component {...pageProps} />
+              </SnackbarProvider>
+            </Provider>
+          </ThemeProvider>
+        </Web3ReactProvider>
       </CacheProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

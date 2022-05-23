@@ -9,6 +9,8 @@ import mongoose from 'mongoose';
 import { ProductTC } from './product';
 import { orderMutation, orderQuery } from './orderSchema';
 import { discountMutation, discountQuery } from './discountSchema';
+import { SessionTC } from './session';
+import { verifyMessage } from 'ethers/lib/utils';
 
 const schemaComposer = new SchemaComposer();
 
@@ -95,6 +97,31 @@ schemaComposer.Mutation.addFields({
       },
     }),
   }),
+  initSession: SessionTC.mongooseResolvers.createOne(),
+  // confirmSession: SessionTC.mongooseResolvers
+  //   .findById()
+  //   .addArgs({
+  //     secret: { type: 'String!' },
+  //   })
+  //   .wrapResolve((next) => (rp) => {
+  //     const resultPromise = next(rp);
+  //     return resultPromise.then((result: any) => {
+  //       if (!result) {
+  //         throw new Error('Session not found');
+  //       }
+  //       result;
+  //       console.log('RESULT: ', result);
+  //       if (!result.nonce) {
+  //         throw new Error('Nonce not found');
+  //       }
+  //       const { secret } = rp.args as { secret: string; _id: string };
+  //       const isVerfied = verifyMessage(result.nonce, secret);
+  //       console.log('IS VERFIED: ', isVerfied);
+  //       console.log(result);
+  //       return result;
+  //     });
+  //   }),
+  confirmSession: SessionTC.getResolver('confirmSession'),
   ...orderMutation,
   ...discountMutation,
   me: UserTC.mongooseResolvers
