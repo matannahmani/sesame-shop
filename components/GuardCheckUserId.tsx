@@ -17,7 +17,7 @@ const useGuardCheckUserId = () => {
     'currentUser',
     async () => {
       const data = await request(
-        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        `/api/graphql`,
         gql`
           query UserOne($id: MongoID!) {
             userById(_id: $id) {

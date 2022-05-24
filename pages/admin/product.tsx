@@ -45,7 +45,7 @@ const ProductPage = () => {
     ['products', drawer.page],
     async () => {
       const data = await request(
-        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        `/api/graphql`,
         gql`
           query Query {
             productMany {
@@ -108,7 +108,7 @@ const ProductPage = () => {
   const { mutate, isLoading: isMutateLoading } = useMutation(
     async (ids: string[]) => {
       const data = await request(
-        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        `/api/graphql`,
         gql`
           mutation ProductRemoveMany($filter: FilterRemoveManyProduct_f) {
             productRemoveMany(filter: $filter) {

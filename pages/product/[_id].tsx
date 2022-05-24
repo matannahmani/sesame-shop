@@ -34,7 +34,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
       _id: i._id,
     },
   }));
-  console.log(mappedIds);
+
   return {
     paths: mappedIds,
     fallback: 'blocking',
@@ -66,42 +66,50 @@ type productIds = {
 }[];
 
 const getProductIds = async () => {
-  const data = await request(
-    process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
-    gql`
-      query ProductMany($limit: Int) {
-        productMany(limit: $limit) {
-          _id
+  try {
+    const data = await request(
+      '/api/graphql',
+      gql`
+        query ProductMany($limit: Int) {
+          productMany(limit: $limit) {
+            _id
+          }
         }
-      }
-    `
-  );
-  return data.productMany as productIds;
+      `
+    );
+    return data.productMany as productIds;
+  } catch (err) {
+    return [];
+  }
 };
 
 export const getProductById = async (id: string) => {
-  const data = await request(
-    `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
-    gql`
-      query ProductById($id: MongoID!) {
-        productById(_id: $id) {
-          name
-          price
-          quantity
-          description
-          image
-          _id
+  try {
+    const data = await request(
+      `/api/graphql`,
+      gql`
+        query ProductById($id: MongoID!) {
+          productById(_id: $id) {
+            name
+            price
+            quantity
+            description
+            image
+            _id
+          }
         }
+      `,
+      {
+        id: id,
       }
-    `,
-    {
-      id: id,
+    );
+    if (data?.productById === null) {
+      throw new Error('Product not found');
     }
-  );
-  if (data?.productById === null) {
-    throw new Error('Product not found');
+    return data.productById;
+  } catch (err) {
+    return null;
   }
-  return data.productById;
 };
 
 export default ProductDetailsPage;

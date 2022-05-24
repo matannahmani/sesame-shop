@@ -86,7 +86,7 @@ const NewProduct = () => {
   const { isLoading, mutateAsync } = useMutation(
     async () => {
       const data = await request(
-        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        `/api/graphql`,
         gql`
           mutation ProductCreateOne($record: CreateOneProductInput!) {
             productCreateOne(record: $record) {
@@ -143,7 +143,7 @@ const NewProduct = () => {
     useMutation(
       async () => {
         const data = await request(
-          `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+          `/api/graphql`,
           gql`
             mutation ProductUpdateOne(
               $record: UpdateOneProductInput!

@@ -27,7 +27,7 @@ const OrderPending = ({
     'products/market',
     async () => {
       const data = await request(
-        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        `/api/graphql`,
         gql`
           query Query {
             productMany {

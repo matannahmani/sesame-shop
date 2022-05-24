@@ -69,7 +69,7 @@ const Web3 = () => {
       const fpReady = await fp.load();
       const fpResult = await fpReady.get();
       const sessionInit = await request(
-        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        `/api/graphql`,
         gql`
           mutation InitSession($record: CreateOneSessionInput!) {
             initSession(record: $record) {
@@ -92,7 +92,7 @@ const Web3 = () => {
         .signMessage(sessionInit.initSession.record.nonce);
       console.log(result);
       const confirmSession = await request(
-        `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT}`,
+        `/api/graphql`,
         gql`
           mutation ConfirmSession($secret: String!, $address: String!) {
             confirmSession(secret: $secret, address: $address) {
