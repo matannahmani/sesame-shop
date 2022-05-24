@@ -6,6 +6,7 @@ import {
 } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import User, { UserTC } from './users';
+import { requestContext } from '../../pages/api/graphql';
 
 interface Session extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
@@ -74,7 +75,13 @@ function createObjectTC(model: mongoose.Model<any>) {
         secret: 'String!',
         address: 'String!',
       },
-      resolve: async ({ args }: { args: confirmSessionArgs }) => {
+      resolve: async ({
+        args,
+        context,
+      }: {
+        args: confirmSessionArgs;
+        context: requestContext;
+      }) => {
         const { secret, address } = args;
         const result = await mongoose.model<Session>('Session').findOne({
           address: address,
@@ -104,6 +111,12 @@ function createObjectTC(model: mongoose.Model<any>) {
             cart: [],
           });
         }
+        context.setCookie('Authorization', `Bearer ${user.toJWT()}`, {
+          httpOnly: true,
+          // maxAge 1 week
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+          secure: true,
+        });
         return user;
       },
     });

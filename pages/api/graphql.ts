@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from 'apollo-server-micro';
-import { MicroRequest } from 'apollo-server-micro/dist/types';
 import GraphQLSchema from '../../models/hyperledger/schemaBuilder';
 import dbConnect from '../../utils/dbConnect';
 import jwt from 'jsonwebtoken';
@@ -7,6 +6,17 @@ import User from '../../models/hyperledger/users';
 import { NextApiRequest, NextApiResponse } from 'next';
 import initMiddleware from '../../utils/init-middleware';
 import Cors from 'cors';
+import { setCookie } from '../../utils/cookies';
+import { CookieSerializeOptions } from 'cookie';
+
+export type requestContext = {
+  setCookie: (
+    name: string,
+    value: string,
+    options: CookieSerializeOptions
+  ) => void;
+  user?: User;
+};
 
 const cors = initMiddleware(
   // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -22,12 +32,25 @@ const cors = initMiddleware(
 
 const apolloServer = new ApolloServer({
   schema: GraphQLSchema,
-  context: async ({ req }: { req: MicroRequest }) => {
+  context: async ({
+    req,
+    res,
+  }: {
+    req: NextApiRequest;
+    res: NextApiResponse;
+  }) => {
     await dbConnect();
-    if (req.headers.authorization) {
-      const token = req.headers.authorization.split(' ')[1];
+    const context = {
+      setCookie: (
+        name: string,
+        value: string,
+        options: CookieSerializeOptions
+      ) => setCookie(res, name, value, options),
+    } as requestContext;
+    if (req.cookies.Authorization) {
       let user = null;
       try {
+        const token = req.cookies.Authorization.split(' ')[1];
         const jwtDecoded = await jwt.verify(token, process.env.JWT_SECRET);
         if (typeof jwtDecoded === 'object') {
           user = await User.findById(jwtDecoded?._id);
@@ -36,10 +59,11 @@ const apolloServer = new ApolloServer({
         console.log(err);
       } finally {
         if (user) {
-          return { user: user };
+          context.user = user;
         }
       }
     }
+    return context;
   },
 });
 

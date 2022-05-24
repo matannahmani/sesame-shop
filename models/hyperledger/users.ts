@@ -5,6 +5,7 @@ import {
 } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import Product, { ProductTC } from './product';
+import jwt from 'jsonwebtoken';
 
 const userRoles = ['sesame-admin', 'user', 'content-manager'] as const;
 type UserRole = typeof userRoles[number];
@@ -74,6 +75,22 @@ const UserSchema = new mongoose.Schema<User>(
     timestamps: true,
   }
 );
+
+UserSchema.methods.toJWT = function () {
+  const token = jwt.sign(
+    {
+      _id: this._id,
+      address: this.address,
+      fp: this.fp,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '7d',
+    }
+  );
+  return token;
+};
+
 const UserCartTC = schemaComposer.createObjectTC(`
   type UserCart {
     prQuantity: Float!
