@@ -12,6 +12,7 @@ interface Discount {
   validDate: Date;
   discount: number;
   isPercentage: boolean;
+  isEnabled: boolean;
 }
 
 // create User model
@@ -23,10 +24,12 @@ const DiscountSchema = new mongoose.Schema<Discount>(
       unique: true,
       index: true,
       minlength: 3,
-      maxlength: 320,
-      immutable(this, doc) {
-        return doc.secret && doc.secret.length > 0;
-      },
+      maxlength: 24,
+    },
+    isEnabled: {
+      type: Boolean,
+      required: true,
+      default: true,
     },
     validDate: {
       type: Date,
@@ -49,16 +52,10 @@ const DiscountSchema = new mongoose.Schema<Discount>(
 DiscountSchema.index({ createdAt: 1 });
 DiscountSchema.index({ updatedAt: 1 });
 
-DiscountSchema.pre('save', function (next) {
-  if (this.isNew || this.isModified('secret')) {
-    if (this.secret.length > 64) {
-      throw new Error('Secret is too long');
-    }
-    this.secret = createHash('sha256').update(this.secret).digest('hex');
-    // this.save();
-  }
-  next();
-});
+type checkCodeArgs = {
+  secret: string;
+};
+
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
 const Discount =
@@ -71,6 +68,25 @@ function createObjectTC(model: mongoose.Model<any>) {
     ModelTC = schemaComposer.getOTC(model.modelName);
   } catch {
     ModelTC = composeMongoose(model, customizationOptions);
+    ModelTC.addResolver({
+      name: 'checkCode',
+      type: ModelTC,
+      args: {
+        secret: 'String!',
+      },
+      resolve: async ({ args }: { args: checkCodeArgs }) => {
+        const { secret } = args;
+        const discount = await Discount.findOne({
+          secret: secret,
+          isEnabled: true,
+          validDate: { $gt: new Date() },
+        });
+        if (discount) {
+          return discount;
+        }
+        throw new Error('Discount not found');
+      },
+    });
   }
   return ModelTC;
 }

@@ -75,6 +75,7 @@ const updateOneDiscount = async (item: any) => {
             secret
             validDate
             discount
+            isEnabled
             isPercentage
             _id
           }
@@ -105,6 +106,7 @@ const DiscountPage = () => {
               secret
               validDate
               discount
+              isEnabled
               isPercentage
               _id
             }
@@ -120,6 +122,7 @@ const DiscountPage = () => {
     { field: 'secret', headerName: 'Secret' },
     { field: 'validDate', headerName: 'validDate', type: 'date' },
     { field: 'discount', headerName: 'discount', type: 'number' },
+    { field: 'isEnabled', headerName: 'Is Enabled', type: 'boolean' },
     { field: 'isPercentage', headerName: 'Percentage Type', type: 'boolean' },
     {
       field: '_id',
@@ -263,6 +266,10 @@ const DiscountPage = () => {
           {
             name: 'discount',
             type: 'number',
+          },
+          {
+            name: 'isPercentage',
+            type: 'boolean',
           },
           {
             name: 'isPercentage',
