@@ -9,7 +9,13 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider, useAtom } from 'jotai';
 import { SnackbarProvider } from 'notistack';
 import { useMemo, useEffect, useState } from 'react';
-import { createTheme, PaletteMode, responsiveFontSizes } from '@mui/material';
+import {
+  Box,
+  createTheme,
+  PaletteMode,
+  responsiveFontSizes,
+  Typography,
+} from '@mui/material';
 import { getStoredTheme } from '../src/theme';
 import ChangeTheme from '../components/ChangeTheme';
 import { darkModeAtom } from '../components/ChangeTheme';
@@ -19,6 +25,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import PrevPageIcon from '../components/PrevPageIcon';
 import { Web3ReactProvider } from '@web3-react/core';
 import { hooks as metaMaskHooks, metaMask } from '../connectors/metaMask';
+import BalanceHeader from '../src/balance';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -59,6 +66,7 @@ export default function MyApp(props: MyAppProps) {
               <SnackbarProvider maxSnack={3}>
                 {/* <ChangeTheme /> */}
                 <PrevPageIcon />
+                <BalanceHeader />
                 <Component {...pageProps} />
               </SnackbarProvider>
             </Provider>

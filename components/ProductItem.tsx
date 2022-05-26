@@ -1,10 +1,39 @@
 import { Box, Button, Grid, Skeleton, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
+import ChainConnector from '../hooks/ChainConnector';
 import Product from '../models/hyperledger/product';
 import { grey, orange } from '../styles/colors';
+import AddToCart from '../src/AddToCart';
+import { Contract, utils } from 'ethers';
 
-const ProductItem = ({ name, description, price, image }: Product) => {
+const ProductItem = ({ _id, name, description, price, image }: Product) => {
+  const { connectToChain, disconnect, info, balance, smartContract, erc20abi } =
+    ChainConnector();
+  const mutation = AddToCart();
+
+  const AddToCartOrLogin = () => {
+    if (!info.isActive) {
+      return connectToChain();
+    }
+    mutation.mutate({
+      productId: `${_id}`,
+      prQuantity: 1,
+    });
+  };
+
+  const PurchaseOrLogin = async () => {
+    if (!info.isActive) {
+      return connectToChain();
+    }
+    const SesameContract = new Contract(
+      '0x6a6e2bB4C12373FB491aD4DEdb7D4c6491B6Be38',
+      erc20abi,
+      info.provider
+    );
+    await SesameContract.transfer(info.account, utils.parseEther('5'));
+  };
+
   return (
     <Box
       sx={{
@@ -65,24 +94,24 @@ const ProductItem = ({ name, description, price, image }: Product) => {
           <Typography variant="h6" sx={{ color: grey.middle_grey }}>
             {description}
           </Typography>
-          <Link href={`/product/checkout`}>
-            <Button
-              variant="contained"
-              sx={{
-                marginTop: 4,
-                // margin: "16px 0px 0px 16px",
-                padding: '15px',
-                fontWeight: 700,
-                borderRadius: 2,
-                width: '100%',
-                fontSize: '16px',
-              }}
-            >
-              BUY
-            </Button>
-          </Link>
+          <Button
+            onClick={PurchaseOrLogin}
+            variant="contained"
+            sx={{
+              marginTop: 4,
+              // margin: "16px 0px 0px 16px",
+              padding: '15px',
+              fontWeight: 700,
+              borderRadius: 2,
+              width: '100%',
+              fontSize: '16px',
+            }}
+          >
+            BUY
+          </Button>
           <Button
             variant="outlined"
+            onClick={AddToCartOrLogin}
             sx={{
               marginTop: 4,
               // margin: "16px 0px 0px 16px",

@@ -70,6 +70,7 @@ schemaComposer.Query.addFields({
 });
 
 schemaComposer.Mutation.addFields({
+  addToCart: UserTC.getResolver('addToCart'),
   ...adminAccess({
     userCreateOne: UserTC.mongooseResolvers.createOne(),
     userCreateMany: UserTC.mongooseResolvers.createMany(),

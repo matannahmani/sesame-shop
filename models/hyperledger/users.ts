@@ -6,6 +6,8 @@ import {
 import mongoose from 'mongoose';
 import Product, { ProductTC } from './product';
 import jwt from 'jsonwebtoken';
+import { requestContext } from '../../pages/api/graphql';
+import e from 'cors';
 
 const userRoles = ['sesame-admin', 'user', 'content-manager'] as const;
 type UserRole = typeof userRoles[number];
@@ -93,11 +95,16 @@ UserSchema.methods.toJWT = function () {
 
 const UserCartTC = schemaComposer.createObjectTC(`
   type UserCart {
-    prQuantity: Float!
+    prQuantity: Number!
     productId: String!
     product: Product!
   }
 `);
+
+export type addToCartArgs = {
+  productId: string;
+  prQuantity: number;
+};
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
 function createObjectTC(model: mongoose.Model<any>) {
@@ -150,7 +157,46 @@ function createObjectTC(model: mongoose.Model<any>) {
       // },
     });
   }
-
+  ModelTC.addResolver({
+    name: 'addToCart',
+    type: ModelTC,
+    args: {
+      productId: 'String!',
+      prQuantity: 'Float!',
+    },
+    resolve: async ({
+      args,
+      context,
+    }: {
+      args: addToCartArgs;
+      context: requestContext;
+    }) => {
+      const { productId, prQuantity } = args;
+      const { user } = context;
+      if (!user) {
+        throw new Error('Must be logged in');
+      }
+      const product = await Product.findById(productId);
+      if (!product) {
+        throw new Error('Product not found');
+      }
+      const newCartItem = {
+        productId: productId,
+        prQuantity: prQuantity,
+      };
+      if (user.cart.some((item) => `${item.productId}` === productId))
+        user.cart.map((item) => {
+          if (`${item.productId}` === productId) {
+            item.prQuantity += prQuantity;
+            return item;
+          }
+          return item;
+        });
+      else user.cart.push(newCartItem);
+      await user.save();
+      return user;
+    },
+  });
   return ModelTC;
 }
 const User = mongoose.models.User || mongoose.model<User>('User', UserSchema);
