@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server-micro';
+import { ApolloServer } from 'apollo-server-micro';
 import GraphQLSchema from '../../models/hyperledger/schemaBuilder';
 import dbConnect from '../../utils/dbConnect';
 import jwt from 'jsonwebtoken';
